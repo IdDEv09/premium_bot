@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>To‘lov</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<h2>💳 To‘lov</h2>
+<p id="info">Yuklanmoqda...</p>
+<button onclick="pay()">To‘lash</button>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const params = new URLSearchParams(window.location.search);
+const order_id = params.get("order_id");
+
+document.getElementById("info").innerText = "Buyurtma ID: #" + order_id;
+
+async function pay(){
+    const res = await fetch("https://YOURDOMAIN.uz/api/payme/create", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({order_id: order_id})
+    });
+    const data = await res.json();
+    if(data.pay_url){
+        window.location.href = data.pay_url;
+    }else{
+        alert("Xatolik yuz berdi");
+    }
+}
+</script>
+</body>
+</html>

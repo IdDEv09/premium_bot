@@ -1,0 +1,38 @@
+# Python bytecode
+pycache/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# SQLite database
+*.db
+database.db
+
+# Log files
+*.log
+
+# OS fayllari
+.DS_Store
+Thumbs.db
+
+# Telegram bot maxfiy fayllari
+secrets.json
+TOKEN
+
+# IDE konfiguratsiyalari
+.idea/
+.vscode/
+
+# Node / WebApp fayllari
+node_modules/
+dist/
+build/
+
+# Misc
+*.bak
+*.swp
