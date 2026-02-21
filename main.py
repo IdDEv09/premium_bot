@@ -5,6 +5,9 @@ from payme import router as payme_router
 
 app = FastAPI()
 app.include_router(payme_router)
+@app.get("/telegram/webhook")
+async def test():
+    return {"status": "webhook ishlayapti"}
 @app.get("/")
 async def root():
     return {"message": "Bot ishlayapti 🚀"}
@@ -16,3 +19,4 @@ async def telegram_webhook(request: Request):
     await dp.feed_update(bot, update)
 
     return {"ok": True}
+
