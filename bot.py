@@ -9,7 +9,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from db import create_order
 
 # ================== SOZLAMALAR ==================
-TOKEN = "8221602548:AAFMKDS9_LDcgdo3IqliByji11y36jjTkjc"
+TOKEN = "8221602548:AAHyjvsXMr5LdLksEtbyEvTMSygS3Gduvsg"
 ADMIN_USERNAME = "isr0049"
 ADMIN_ID = 8001913525
 CHANNEL = "@a1withus"  # Kanal username yoki private ID
@@ -21,27 +21,27 @@ dp = Dispatcher(storage=MemoryStorage())
 PRICES = {
     # Premium
     "1 oy Premium - 40k": 40000,
-    "3 oy Premium - 100k": 100000,
-    "6 oy Premium - 180k": 180000,
-    "12 oy Premium - 300k": 300000,
+    "3 oy Premium - 165k": 165000,
+    "6 oy Premium - 220k": 220000,
+    "12 oy Premium - 395k": 395000,
     # Stars
     "50 ⭐️ - 10k": 10000,
-    "100 ⭐️ - 18k": 18000,
-    "250 ⭐️ - 40k": 40000,
-    "500 ⭐️ - 75k": 75000,
-    "1000 ⭐️ - 140k": 140000,
-    "1500 ⭐️ - 200k": 200000,
-    "2000 ⭐️ - 280k": 280000,
-    "3000 ⭐️ - 380k": 380000,
+    "100 ⭐️ - 20k": 20000,
+    "250 ⭐️ - 49k": 49000,
+    "500 ⭐️ - 99k": 99000,
+    "1000 ⭐️ - 195k": 195000,
+    "1500 ⭐️ - 290k": 290000,
+    "2500 ⭐️ - 480k": 480000,
+    "5000 ⭐️ - 950k": 950000,
     # Gifts
-    "❤️ Yurak - 5k": 5000,
-    "🧸 Ayiqcha - 15k": 15000,
-    "🌹 Atirgul - 10k": 10000,
-    "🎂 Tort - 20k": 20000,
-    "💐 Guldasta - 25k": 25000,
-    "🚀 Raketa - 30k": 30000,
-    "💍 Uzuk - 50k": 50000,
-    "💎 Diamond - 100k": 100000,
+    "❤️ Yurak - 3k": 3000,
+    "🧸 Ayiqcha - 3k": 3000,
+    "🌹 Atirgul - 5k": 5000,
+    "🎂 Tort - 5k": 5000,
+    "💐 Guldasta - 10k": 10000,
+    "🚀 Raketa - 10k": 10000,
+    "💍 Uzuk - 20k": 20000,
+    "💎 Diamond - 20k": 20000,
 }
 
 # ================== MENULAR ==================
@@ -57,9 +57,9 @@ def premium_menu():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="1 oy Premium - 40k")],
-            [KeyboardButton(text="3 oy Premium - 100k")],
-            [KeyboardButton(text="6 oy Premium - 180k")],
-            [KeyboardButton(text="12 oy Premium - 300k")],
+            [KeyboardButton(text="3 oy Premium - 165k")],
+            [KeyboardButton(text="6 oy Premium - 220k")],
+            [KeyboardButton(text="12 oy Premium - 395k")],
             [KeyboardButton(text="🔙 Orqaga")]
         ], resize_keyboard=True
     )
@@ -67,10 +67,10 @@ def premium_menu():
 def stars_menu():
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="50 ⭐️ - 10k"), KeyboardButton(text="100 ⭐️ - 18k")],
-            [KeyboardButton(text="250 ⭐️ - 40k"), KeyboardButton(text="500 ⭐️ - 75k")],
-            [KeyboardButton(text="1000 ⭐️ - 140k"), KeyboardButton(text="1500 ⭐️ - 200k")],
-            [KeyboardButton(text="2000 ⭐️ - 280k"), KeyboardButton(text="3000 ⭐️ - 380k")],
+            [KeyboardButton(text="50 ⭐️ - 10k"), KeyboardButton(text="100 ⭐️ - 20k")],
+            [KeyboardButton(text="250 ⭐️ - 49k"), KeyboardButton(text="500 ⭐️ - 99k")],
+            [KeyboardButton(text="1000 ⭐️ - 195k"), KeyboardButton(text="1500 ⭐️ - 290k")],
+            [KeyboardButton(text="2500 ⭐️ - 480k"), KeyboardButton(text="5000 ⭐️ - 950k")],
             [KeyboardButton(text="🔙 Orqaga")]
         ], resize_keyboard=True
     )
@@ -78,10 +78,10 @@ def stars_menu():
 def gift_menu():
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="❤️ Yurak - 5k"), KeyboardButton(text="🧸 Ayiqcha - 15k")],
-            [KeyboardButton(text="🌹 Atirgul - 10k"), KeyboardButton(text="🎂 Tort - 20k")],
-            [KeyboardButton(text="💐 Guldasta - 25k"), KeyboardButton(text="🚀 Raketa - 30k")],
-            [KeyboardButton(text="💍 Uzuk - 50k"), KeyboardButton(text="💎 Diamond - 100k")],
+            [KeyboardButton(text="❤️ Yurak - 3k"), KeyboardButton(text="🧸 Ayiqcha - 3k")],
+            [KeyboardButton(text="🌹 Atirgul - 5k"), KeyboardButton(text="🎂 Tort - 10k")],
+            [KeyboardButton(text="💐 Guldasta - 10k"), KeyboardButton(text="🚀 Raketa - 10k")],
+            [KeyboardButton(text="💍 Uzuk - 20k"), KeyboardButton(text="💎 Diamond - 20k")],
             [KeyboardButton(text="🔙 Orqaga")]
         ], resize_keyboard=True
     )
@@ -193,8 +193,8 @@ async def process_username(message: Message, state: FSMContext):
     }
 
     # To‘lov linklari
-    payme_url = f"https://checkout.paycom.uz/YOUR_PAYME_MERCHANT?amount={price*100}&account[order_id]={oid}"
-    miniapp_url = f"https://YOURDOMAIN.uz/miniapp/index.html?order_id={oid}"
+    payme_url = f"https://checkout.paycom.uz/OWDQxXV7HuqVf7J34xIp60j?GVjCPbT4r88Z?amount={price*100}&account[order_id]={oid}"
+    miniapp_url = f"const miniapp_url = https://premiumbot-production-422a.up.railway.app/miniapp/index.html?order_id={oid};"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
