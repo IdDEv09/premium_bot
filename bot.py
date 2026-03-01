@@ -6,13 +6,12 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
-from db import create_order
 
 # ================== SOZLAMALAR ==================
 TOKEN = "8221602548:AAHyjvsXMr5LdLksEtbyEvTMSygS3Gduvsg"
 ADMIN_USERNAME = "isr0049"
 ADMIN_ID = 8001913525
-CHANNEL = "@a1withus"  # Kanal username yoki private ID
+CHANNEL = "@a1withus"
 
 bot = Bot(TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
@@ -107,6 +106,7 @@ async def check_subscription(user_id: int) -> bool:
         return False
 
 # ================== START ==================
+
 @dp.message(CommandStart())
 async def start_cmd(message: Message):
     if await check_subscription(message.from_user.id):
@@ -163,11 +163,20 @@ async def ask_username(message: Message, state: FSMContext):
     product = message.text
     await state.update_data(product=product)
 
-    # 1 oylik Premium → faqat admin
+    # 1 oylik Premium → har qanday foydalanuvchi username kiritganda avtomatik beriladi
     if "1 oy Premium" in product:
-        await message.answer(f"1 oylik premium faqat admin orqali beriladi.\n👉 https://t.me/{ADMIN_USERNAME}")
-        # Adminga xabar
-        await bot.send_message(ADMIN_ID, f"❗️ Foydalanuvchi @{message.from_user.username} 1 oylik Premium olishni xohladi.")
+        # Inline tugma bilan to‘lov emas, faqat xabar
+        await message.answer(f"✅ 1 oylik Premium avtomatik berildi! 🎉\n@{message.from_user.username}")
+        oid = order_id_seq
+        order_id_seq += 1
+        orders[oid] = {
+            "user_id": message.from_user.id,
+            "username": message.from_user.username,
+            "product": product,
+            "amount": PRICES[product],
+            "status": "done"
+        }
+        await bot.send_message(ADMIN_ID, f"🆕 Buyurtma #{oid} - 1 oylik Premium avtomatik berildi @{message.from_user.username}")
         return
 
     await message.answer("Kim uchun? (@username kiriting)")
@@ -193,14 +202,14 @@ async def process_username(message: Message, state: FSMContext):
     }
 
     # To‘lov linklari
-    payme_url = f"https://checkout.paycom.uz/OWDQxXV7HuqVf7J34xIp60j?GVjCPbT4r88Z?amount={price*100}&account[order_id]={oid}"
-    miniapp_url = f"const miniapp_url = https://premiumbot-production-422a.up.railway.app/miniapp/index.html?order_id={oid};"
+    payme_url = f"https://merchant.payme.uz/business/697b7d32c4a421a1da3e393b?amount={price*100}&account[order_id]={oid}"
+    miniapp_url = f"https://telgram-bot-krba.onrender.com/miniapp/index.html?order_id={oid}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
-        [InlineKeyboardButton(text="💳 Payme orqali to‘lov", url=payme_url)]
+        [InlineKeyboardButton(text="💳 O‘zimga", url=miniapp_url)],
+        [InlineKeyboardButton(text="💳 Boshqasiga", url=payme_url)],
+        [InlineKeyboardButton(text="🔙 Orqaga", callback_data="back")]
     ])
-
     await message.answer(
         f"🧾 Buyurtma #{oid}\n{product}\n👤 @{username}\n\nTo‘lov uchun bosing 👇",
         reply_markup=kb
