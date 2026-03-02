@@ -165,7 +165,7 @@ async def choose_recipient_cb(c, state: FSMContext):
     }
 
     payme_url = f"https://merchant.payme.uz/business/697b7d32c4a421a1da3e393b?amount={price*100}&account[order_id]={oid}"
-    miniapp_url = f"https://telegram-bot-krba.onrender.com/miniapp/index.html?order_id={oid}"
+    miniapp_url = f"https://premium-bot-9i2r.onrender.com/miniapp/index.html?order_id={oid}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
@@ -201,7 +201,7 @@ async def process_username(message: Message, state: FSMContext):
     }
 
     payme_url = f"https://merchant.payme.uz/business/697b7d32c4a421a1da3e393b?amount={price*100}&account[order_id]={oid}"
-    miniapp_url = f"https://telegram-bot-krba.onrender.com/miniapp/index.html?order_id={oid}"
+    miniapp_url = f"https://premium-bot-9i2r.onrender.com/miniapp/index.html?order_id={oid}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
