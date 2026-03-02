@@ -11,7 +11,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 TOKEN = "8221602548:AAHyjvsXMr5LdLksEtbyEvTMSygS3Gduvsg"
 ADMIN_USERNAME = "isr0049"
 ADMIN_ID = 8001913525
-CHANNEL = "@a1withus"
+CHANNEL = "@a1withus"  # Kanal username yoki private ID
 
 bot = Bot(TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
@@ -78,7 +78,7 @@ def gift_menu():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="❤️ Yurak - 3k"), KeyboardButton(text="🧸 Ayiqcha - 3k")],
-            [KeyboardButton(text="🌹 Atirgul - 5k"), KeyboardButton(text="🎂 Tort - 10k")],
+            [KeyboardButton(text="🌹 Atirgul - 5k"), KeyboardButton(text="🎂 Tort - 5k")],
             [KeyboardButton(text="💐 Guldasta - 10k"), KeyboardButton(text="🚀 Raketa - 10k")],
             [KeyboardButton(text="💍 Uzuk - 20k"), KeyboardButton(text="💎 Diamond - 20k")],
             [KeyboardButton(text="🔙 Orqaga")]
@@ -95,6 +95,7 @@ subscribe_kb = InlineKeyboardMarkup(
 # ================== FSM ==================
 class BuyState(StatesGroup):
     waiting_username = State()
+    choosing_recipient = State()
 
 # ================== OBUNA TEKSHIRUV ==================
 async def check_subscription(user_id: int) -> bool:
@@ -106,7 +107,6 @@ async def check_subscription(user_id: int) -> bool:
         return False
 
 # ================== START ==================
-
 @dp.message(CommandStart())
 async def start_cmd(message: Message):
     if await check_subscription(message.from_user.id):
@@ -158,38 +158,76 @@ orders = {}
 order_id_seq = 1
 
 @dp.message(F.text.in_(PRICES.keys()))
-async def ask_username(message: Message, state: FSMContext):
+async def ask_recipient(message: Message, state: FSMContext):
     global order_id_seq
     product = message.text
-    await state.update_data(product=product)
 
-    # 1 oylik Premium → har qanday foydalanuvchi username kiritganda avtomatik beriladi
+    # 1 oylik premium faqat admin orqali
     if "1 oy Premium" in product:
-        # Inline tugma bilan to‘lov emas, faqat xabar
-        await message.answer(f"✅ 1 oylik Premium avtomatik berildi! 🎉\n@{message.from_user.username}")
-        oid = order_id_seq
-        order_id_seq += 1
-        orders[oid] = {
-            "user_id": message.from_user.id,
-            "username": message.from_user.username,
-            "product": product,
-            "amount": PRICES[product],
-            "status": "done"
-        }
-        await bot.send_message(ADMIN_ID, f"🆕 Buyurtma #{oid} - 1 oylik Premium avtomatik berildi @{message.from_user.username}")
+        await message.answer(f"1 oylik Premium faqat admin orqali beriladi.\n👉 https://t.me/{ADMIN_USERNAME}")
+        await bot.send_message(ADMIN_ID, f"❗️ @{message.from_user.username} 1 oylik Premium olishni xohladi.")
         return
 
-    await message.answer("Kim uchun? (@username kiriting)")
-    await state.set_state(BuyState.waiting_username)
+    await state.update_data(product=product)
+    await message.answer("Kim uchun olmoqchisiz?", reply_markup=InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="O'zimga", callback_data="to_self"),
+             InlineKeyboardButton(text="Boshqasiga", callback_data="to_other")],
+            [InlineKeyboardButton(text="🔙 Orqaga", callback_data="back")]
+        ]
+    ))
+    await state.set_state(BuyState.choosing_recipient)
+
+@dp.callback_query(F.data.in_({"to_self", "to_other"}))
+async def choose_recipient_cb(c, state: FSMContext):
+    data = await state.get_data()
+    product = data["product"]
+    price = PRICES[product]
+
+    global order_id_seq
+    oid = order_id_seq
+    order_id_seq += 1
+
+    if c.data == "to_self":
+        username = c.from_user.username
+    else:
+        await c.message.answer("Iltimos, foydalanuvchi @username kiriting:")
+        await state.set_state(BuyState.waiting_username)
+        return
+
+    orders[oid] = {
+        "user_id": c.from_user.id,
+        "username": username,
+        "product": product,
+        "amount": price,
+        "status": "pending"
+    }
+
+    # To‘lov linklari
+    payme_url = f"https://merchant.payme.uz/business/697b7d32c4a421a1da3e393b?amount={price*100}&account[order_id]={oid}"
+    miniapp_url = f"https://telgram-bot-krba.onrender.com/miniapp/index.html?order_id={oid}"
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
+        [InlineKeyboardButton(text="💳 Payme orqali to‘lov", url=payme_url)]
+    ])
+
+    await c.message.answer(
+        f"🧾 Buyurtma #{oid}\n{product}\n👤 @{username}\n\nTo‘lov uchun bosing 👇",
+        reply_markup=kb
+    )
+
+    await bot.send_message(ADMIN_ID, f"🆕 Buyurtma #{oid}\n{product}\n@{username}")
+    await state.clear()
 
 @dp.message(BuyState.waiting_username)
 async def process_username(message: Message, state: FSMContext):
-    global order_id_seq
     data = await state.get_data()
     product = data["product"]
     username = message.text.replace("@", "")
     price = PRICES[product]
 
+    global order_id_seq
     oid = order_id_seq
     order_id_seq += 1
 
@@ -206,10 +244,10 @@ async def process_username(message: Message, state: FSMContext):
     miniapp_url = f"https://telgram-bot-krba.onrender.com/miniapp/index.html?order_id={oid}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 O‘zimga", url=miniapp_url)],
-        [InlineKeyboardButton(text="💳 Boshqasiga", url=payme_url)],
-        [InlineKeyboardButton(text="🔙 Orqaga", callback_data="back")]
+        [InlineKeyboardButton(text="💳 Karta orqali to‘lov", url=miniapp_url)],
+        [InlineKeyboardButton(text="💳 Payme orqali to‘lov", url=payme_url)]
     ])
+
     await message.answer(
         f"🧾 Buyurtma #{oid}\n{product}\n👤 @{username}\n\nTo‘lov uchun bosing 👇",
         reply_markup=kb
