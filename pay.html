@@ -1,37 +1,56 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<title>To‘lov</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniApp To‘lov</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+    button { padding: 15px 25px; margin: 10px; font-size: 16px; cursor: pointer; }
+  </style>
 </head>
 <body>
-<h2>💳 To‘lov</h2>
-<p id="info">Yuklanmoqda...</p>
-<button onclick="pay()">To‘lash</button>
+  <h2>Mahsulotni qayerga olishni xohlaysiz?</h2>
+  <div>
+    <button id="toSelf">O'zimga</button>
+    <button id="toOther">Boshqasiga</button>
+    <button id="back">🔙 Orqaga</button>
+  </div>
 
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+  <script>
+    // URL dan order_id ni olish
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get("order_id");
 
-const params = new URLSearchParams(window.location.search);
-const order_id = params.get("order_id");
+    // Tugmalarni olish
+    const toSelfBtn = document.getElementById("toSelf");
+    const toOtherBtn = document.getElementById("toOther");
+    const backBtn = document.getElementById("back");
 
-document.getElementById("info").innerText = "Buyurtma ID: #" + order_id;
-
-async function pay(){
-    const res = await fetch("https://YOURDOMAIN.uz/api/payme/create", {
+    // Tugma bosilganda bot backendga fetch qiladi
+    toSelfBtn.onclick = async () => {
+      await fetch(/api/payme/confirm_order, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({order_id: order_id})
-    });
-    const data = await res.json();
-    if(data.pay_url){
-        window.location.href = data.pay_url;
-    }else{
-        alert("Xatolik yuz berdi");
-    }
-}
-</script>
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId, type: "to_self" })
+      });
+      alert("✅ Buyurtma sizga tayyorlandi!");
+    };
+
+    toOtherBtn.onclick = async () => {
+      const username = prompt("Iltimos, foydalanuvchi @username kiriting:");
+      if (!username) return;
+      await fetch(/api/payme/confirm_order, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId, type: "to_other", username })
+      });
+      alert(✅ Buyurtma @${username} uchun tayyorlandi!);
+    };
+
+    backBtn.onclick = () => {
+      window.history.back();
+    };
+  </script>
 </body>
 </html>
